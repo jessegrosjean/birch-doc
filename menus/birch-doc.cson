@@ -5,7 +5,7 @@
       'label': 'birch-doc'
       'submenu': [
         {
-          'label': 'Render Atom Doc'
+          'label': 'Render Atom Doc NOW'
           'command': 'birch-doc:render-birch-doc'
         }
       ]

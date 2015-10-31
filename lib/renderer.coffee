@@ -20,7 +20,7 @@ class Renderer
 
   renderDocs: (sourcePaths, outPath, options={}) ->
     sourcePaths ?= atom.project.getPaths()
-    outPath ?= '/Users/jesse/moosetest'
+    outPath ?= '/Users/jessegrosjean/Desktop/docs'
     if sourcePaths
       unless fs.existsSync(outPath)
         fs.mkdirSync(outPath)
