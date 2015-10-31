@@ -1,0 +1,14 @@
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'birch-doc'
+      'submenu': [
+        {
+          'label': 'Render Atom Doc'
+          'command': 'birch-doc:render-birch-doc'
+        }
+      ]
+    ]
+  }
+]

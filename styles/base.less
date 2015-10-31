@@ -1,0 +1,93 @@
+// The ui-variables file is provided by base themes provided by Atom.
+//
+// See https://github.com/atom/atom-dark-ui/blob/master/styles/ui-variables.less
+// for a full listing of what's available.
+@import "ui-variables";
+@import "syntax-variables";
+@import "./octicons";
+
+@monospace-fonts: 'Source Code Pro', Menlo, Monaco, Consolas, 'Courier New', monospace;
+
+doc-browser {
+  overflow: auto;
+  font-size: @font-size;
+  font-family: @font-family;
+  line-height: @component-line-height;
+  padding: @component-padding;
+  background: @pane-item-background-color;
+
+  a {
+    color: @text-color-info;
+  }
+
+  code {
+    color: @syntax-text-color;
+    background-color: @syntax-background-color;
+    font-family: @monospace-fonts;
+  }
+
+  pre {
+    border: 1px solid @base-border-color;
+    code {
+      //.hljs;
+    }
+  }
+
+  .signature {
+    font-family: @monospace-fonts;
+  }
+
+  //
+  // Jesse Ads...
+  //
+
+  pre {
+    margin: 1rem 0;
+  }
+
+  dt.property-def, dt.method-def {
+    font-weight: normal;
+  }
+
+  dt.class-def:hover, dt.property-def:hover, dt.method-def:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  dd.class-def, dd.property-def, dd.method-def {
+    display: none;
+    margin: 1rem;
+    .table>thead>tr>th {
+      border-bottom: none;
+    }
+  }
+
+  dd.class-def {
+    margin-left: 0;
+  }
+
+  table {
+    width: 100%;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+    border: 1px solid @base-border-color;
+  }
+
+  thead {
+    background: #eee;
+  }
+
+  tbody {
+    th {
+      font-weight: normal;
+      font-family: monospace
+    }
+  }
+
+  th, td {
+    padding: 0.5rem;
+    vertical-align: top;
+  }
+
+}
