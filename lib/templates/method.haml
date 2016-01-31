@@ -1,7 +1,11 @@
 %dt{id: @id, class: 'method-def'}
-  %span.signature!= @signature
-%dd{class: 'method-def'}
-  != @description
-  != @examples
-  != @parameterBlock
-  != @returnValueBlock
+  %code.signature!= @signature
+%dd{class: 'method-def m-t-md m-b-md'}
+  - if @description
+    != @description
+  - if @examples
+    != @examples
+  - if @parameterBlock
+    != @parameterBlock
+  - if @returnValueBlock
+    != @returnValueBlock

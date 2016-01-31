@@ -1,7 +1,12 @@
 %h2= @name
 %dl
-  != @description
-  != @classProperties
-  != @properties
-  != @classMethods
-  != @methods
+  - if @description
+    != @description
+  - if @classProperties
+    != @classProperties
+  - if @properties
+    != @properties
+  - if @classMethods
+    != @classMethods
+  - if @methods
+    != @methods

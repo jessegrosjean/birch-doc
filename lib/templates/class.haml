@@ -1,10 +1,18 @@
-:plain
-  ---
-  layout: #{@layout}
-  title: #{@name}
-  breadcrumb: #{@name}
-  ---
-
-!= @descriptionSection
-!= @examplesSection
-!= @sections
+%div{class: 'class-def'}
+  :plain
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script>
+      $( document ).ready(function() {
+        $('.class-def dd').hide();
+        $('.class-def dt').click(function(){
+          $(this).next('dd').slideToggle();
+        });
+      });
+    </script>
+  %h1!= @name
+  - if @descriptionSection
+    != @descriptionSection
+  - if @examplesSection
+    != @examplesSection
+  - if @sections
+    != @sections

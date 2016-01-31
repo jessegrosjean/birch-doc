@@ -20,7 +20,7 @@ class Renderer
 
   renderDocs: (sourcePaths, outPath, options={}) ->
     sourcePaths ?= atom.project.getPaths()
-    outPath ?= '/Users/jessegrosjean/Desktop/docs'
+    outPath ?= '/Users/jessegrosjean/Desktop/gitbooktest'
     if sourcePaths
       unless fs.existsSync(outPath)
         fs.mkdirSync(outPath)
@@ -36,7 +36,7 @@ class Renderer
       classDir = path.join(outPath, name)
       unless fs.existsSync(classDir)
         fs.mkdirSync(classDir)
-      fs.writeFileSync(path.join(classDir, 'index.html'), renderedClazz)
+      fs.writeFileSync(path.join(classDir, 'index.md'), renderedClazz)
 
   renderClassList: (outPath) ->
     classes = []
@@ -71,6 +71,7 @@ class Renderer
     @renderTemplate('examples', examples: examples)
 
   renderExample: (example) ->
+    example.description = @renderMarkdown(example.description)
     example.raw = @renderReferences(example.raw)
     example.raw = @renderMarkdown(example.raw)
     @renderTemplate('example', example)

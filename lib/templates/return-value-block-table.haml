@@ -1,6 +1,7 @@
-%table.table.table-hover.table-condensed.return-value
+%table.table.table-condensed.m-t.return-value
   %thead
     %tr
       %th Return Values
   %tbody
-    != @rows
+    - if @rows
+      != @rows

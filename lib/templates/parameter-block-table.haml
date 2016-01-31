@@ -1,4 +1,4 @@
-%table.table.table-hover.table-condensed.parameter
+%table.table.table-condensed.parameter
   %col{style: 'width:25%'}
   %col{style: 'width:75%'}
   %thead
@@ -6,4 +6,5 @@
       %th Argument
       %th Description
   %tbody
-    != @rows
+    - if @rows
+      != @rows

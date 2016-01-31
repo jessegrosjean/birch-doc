@@ -1,7 +1,10 @@
 %tr
-  %th><= @name
-    - if @isOptional
-      %sup?
-  %td
-    != @description
-    != @children
+  %th
+    %code><= @name
+      - if @isOptional
+        %sup?
+  %td<
+    - if @description
+      != @description
+    - if @children
+      != @children

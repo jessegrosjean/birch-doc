@@ -1,4 +1,5 @@
 %li
   %code= @name
   &mdash;
-  != @description
+  - if @description
+    != @description
