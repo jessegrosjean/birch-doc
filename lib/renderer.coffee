@@ -20,7 +20,7 @@ class Renderer
 
   renderDocs: (sourcePaths, outPath, options={}) ->
     sourcePaths ?= atom.project.getPaths()
-    outPath ?= '/Users/jessegrosjean/Desktop/gitbooktest'
+    outPath ?= '/Users/jessegrosjean/Desktop/birchapi'
     if sourcePaths
       unless fs.existsSync(outPath)
         fs.mkdirSync(outPath)
@@ -33,11 +33,11 @@ class Renderer
   renderClasses: (outPath, options) ->
     for name, clazz of @metadata.classes
       renderedClazz = @renderClass clazz, options
-      classDir = path.join(outPath, name)
-      unless fs.existsSync(classDir)
-        fs.mkdirSync(classDir)
-      fs.writeFileSync(path.join(classDir, 'index.md'), renderedClazz)
-
+      #classDir = path.join(outPath, name)
+      #unless fs.existsSync(classDir)
+      #  fs.mkdirSync(classDir)
+      #fs.writeFileSync(path.join(classDir, 'index.md'), renderedClazz)
+      fs.writeFileSync(path.join(outPath, "#{name}.md"), renderedClazz)
   renderClassList: (outPath) ->
     classes = []
     for name, clazz of @metadata.classes
@@ -318,19 +318,19 @@ class Renderer
   resolveStaticReference: (klass, item, text) ->
     switch
       when klass is '' then { name: text, url: "#static-#{item}" }
-      when @metadata.classes[klass] then { name: text, url: "../#{klass}#static-#{item}" }
+      when @metadata.classes[klass] then { name: text, url: "#{klass}.html#static-#{item}" }
       when @referenceMap[klass] then { name: text, url: "#{mozillaJavascriptBaseUrl}/#{klass}/#{item}" }
 
   resolveInstanceReference: (klass, item, text) ->
     switch
       when klass is '' then { name: text, url: "#instance-#{item}" }
-      when @metadata.classes[klass] then { name: text, url: "../#{klass}#instance-#{item}" }
+      when @metadata.classes[klass] then { name: text, url: "#{klass}.html#instance-#{item}" }
       when @referenceMap[klass] then { name: text, url: "#{mozillaJavascriptBaseUrl}/#{klass}/#{item}" }
 
   resolveClassReference: (klass, text) ->
     switch
       when @metadata?.classes?[klass]
-        { name: klass, url: '../' + klass}
+        { name: klass, url: klass + '.html'}
       when @referenceMap[klass]
         { name: klass, url: @referenceMap[klass] }
       else text
