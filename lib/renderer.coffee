@@ -1,7 +1,7 @@
-{allowUnsafeEval, allowUnsafeNewFunction} = require 'loophole'
 highlightjs = require 'highlight.js'
 _ = require 'underscore-plus'
 hamlc = require 'haml-coffee'
+assert = require 'assert'
 marked = require 'marked'
 tello = require 'tello'
 donna = require 'donna'
@@ -18,9 +18,9 @@ class Renderer
   Section: Render
   ###
 
-  renderDocs: (sourcePaths, outPath, options={}) ->
-    sourcePaths ?= atom.project.getPaths()
-    outPath ?= '/Users/jessegrosjean/Desktop/birchapi'
+  renderModules: (sourcePaths, outPath, options={}) ->
+    assert(sourcePaths, 'requires sourcePaths param')
+    assert(outPath, 'requires outPath param')
     if sourcePaths
       unless fs.existsSync(outPath)
         fs.mkdirSync(outPath)
@@ -33,11 +33,8 @@ class Renderer
   renderClasses: (outPath, options) ->
     for name, clazz of @metadata.classes
       renderedClazz = @renderClass clazz, options
-      #classDir = path.join(outPath, name)
-      #unless fs.existsSync(classDir)
-      #  fs.mkdirSync(classDir)
-      #fs.writeFileSync(path.join(classDir, 'index.md'), renderedClazz)
       fs.writeFileSync(path.join(outPath, "#{name}.md"), renderedClazz)
+
   renderClassList: (outPath) ->
     classes = []
     for name, clazz of @metadata.classes
@@ -200,10 +197,8 @@ class Renderer
     unless template = @compiledTemplates[templateName]
       templatePath = path.join(path.dirname(__dirname), 'lib', 'templates', templateName + '.haml')
       templateSource = fs.readFileSync(templatePath).toString()
-      allowUnsafeEval =>
-        allowUnsafeNewFunction =>
-          template = hamlc.compile(templateSource, escapeAttributes: false)
-          @compiledTemplates[templateName] = template
+      template = hamlc.compile(templateSource, escapeAttributes: false)
+      @compiledTemplates[templateName] = template
 
     if options.resolve
       for field in options.resolve
