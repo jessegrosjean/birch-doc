@@ -48,8 +48,8 @@ class Renderer
 
   renderClass: (clazz, options) ->
     clazz.descriptionSection = @renderDescriptionSection(clazz)
-    clazz.examplesSection = @renderExamplesSection(clazz)
-    clazz.sections = @renderSections(clazz)
+    clazz.examplesSection = @renderExamplesSection(clazz, options)
+    clazz.sections = @renderSections(clazz, options)
     clazz.layout = options.layout or 'default'
     clazz.classesPath = options.classesPath or ''
     content = @renderTemplate 'class', clazz
@@ -61,9 +61,10 @@ class Renderer
         resolve: ['description']
         markdown: ['description']
 
-  renderExamplesSection: (object) ->
+  renderExamplesSection: (object, options) ->
     return '' unless object.examples
-    console.log("  Examples")
+    if options?.verbose
+      console.log("  Examples")
     examples = (@renderExample(example) for example in object.examples).join('\n')
     @renderTemplate('examples', examples: examples)
 
@@ -73,18 +74,18 @@ class Renderer
     example.raw = @renderMarkdown(example.raw)
     @renderTemplate('example', example)
 
-  renderSections: (clazz) ->
+  renderSections: (clazz, options) ->
     sections = clazz.sections
     sections.unshift({name: null})
-    (@renderSection(clazz, section) for section in sections).join('\n')
+    (@renderSection(clazz, section, options) for section in sections).join('\n')
 
-  renderSection: (clazz, section) ->
-    console.log("  Section: #{section.name}")
-
-    section.classProperties = @renderProperties(clazz.classProperties, section.name, 'static')
-    section.properties = @renderProperties(clazz.instanceProperties, section.name, 'instance')
-    section.classMethods = @renderMethods(clazz.classMethods, section.name, 'static')
-    section.methods = @renderMethods(clazz.instanceMethods, section.name, 'instance')
+  renderSection: (clazz, section, options) ->
+    if options?.verbose
+      console.log("  Section: #{section.name}")
+    section.classProperties = @renderProperties(clazz.classProperties, section.name, 'static', options)
+    section.properties = @renderProperties(clazz.instanceProperties, section.name, 'instance', options)
+    section.classMethods = @renderMethods(clazz.classMethods, section.name, 'static', options)
+    section.methods = @renderMethods(clazz.instanceMethods, section.name, 'instance', options)
     section.description = @renderReferences(section.description)
     section.description = @renderMarkdown(section.description)
 
@@ -93,30 +94,32 @@ class Renderer
        section.description.length > 0
       @renderTemplate('section', section)
 
-  renderProperties: (properties, sectionName, type) ->
+  renderProperties: (properties, sectionName, type, options) ->
     props = _.filter properties, (prop) -> prop.sectionName is sectionName
-    props = _.map props, (prop) => @renderProperty(prop, type: type)
+    props = _.map props, (prop) => @renderProperty(prop, type, options)
     props.join('\n')
 
-  renderProperty: (property, options) ->
-    console.log("    Property: #{property.name}")
-    property.id = "#{options.type}-#{property.name}"
-    property.type = options.type
-    property.signature = "#{@renderSignifier(options.type)}#{property.name}"
-    property.examples = @renderExamplesSection(property)
+  renderProperty: (property, type, options) ->
+    if options?.verbose
+      console.log("    Property: #{property.name}")
+    property.id = "#{type}-#{property.name}"
+    property.type = type
+    property.signature = "#{@renderSignifier(type)}#{property.name}"
+    property.examples = @renderExamplesSection(property, options)
     @renderTemplate('property', property, resolve: ['description'], markdown: ['description'])
 
-  renderMethods: (methods, sectionName, type) ->
+  renderMethods: (methods, sectionName, type, options) ->
     methods = _.filter methods, (method) -> method.sectionName is sectionName
-    methods = _.map methods, (method) => @renderMethod(method, type: type)
+    methods = _.map methods, (method) => @renderMethod(method, type, options)
     methods.join('\n')
 
-  renderMethod: (method, options) ->
-    console.log("    Method: #{method.name}")
-    method.id = "#{options.type}-#{method.name}"
-    method.type = options.type
-    method.signature = "#{@renderSignifier(options.type)}#{@renderSignature(method)}"
-    method.examples = @renderExamplesSection(method)
+  renderMethod: (method, type, options) ->
+    if options?.verbose
+      console.log("    Method: #{method.name}")
+    method.id = "#{type}-#{method.name}"
+    method.type = type
+    method.signature = "#{@renderSignifier(type)}#{@renderSignature(method)}"
+    method.examples = @renderExamplesSection(method, options)
     method.parameterBlock = if method.arguments then @renderParameterBlock(method) else ''
     method.returnValueBlock = if method.returnValues then @renderReturnValueBlock(method) else ''
     @renderTemplate('method', method, resolve: ['description'], markdown: ['description'])
