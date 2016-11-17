@@ -1,7 +1,7 @@
 {
   "name": "birch-doc",
   "version": "0.0.1",
-  "description": "Generates API documentation for Coffeescript packages",
+  "description": "Generates API documentation for birch-outline",
   "repository": "https://github.com/jessegrosjean/birch-doc",
   "license": "MIT",
   "dependencies": {
