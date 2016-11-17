@@ -1,6 +1,6 @@
 {
   "name": "birch-doc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Generates API documentation for birch-outline",
   "repository": "https://github.com/jessegrosjean/birch-doc",
   "license": "MIT",
