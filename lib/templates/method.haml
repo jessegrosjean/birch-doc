@@ -1,6 +1,10 @@
 %dt{id: @id, class: 'method-def'}
   %code.signature!= @signature
-%dd{class: 'method-def m-t-md m-b-md'}
+%dd{class: "method-def method-kind-#{@kind} m-t-md m-b-md"}
+  - if @kind is 'get'
+    %p{class='read-write-ability'} Read-only
+  - if @kind is 'set'
+    %p{} Write-only
   - if @description
     != @description
   - if @examples

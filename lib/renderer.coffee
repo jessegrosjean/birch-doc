@@ -1,12 +1,36 @@
 highlightjs = require 'highlight.js'
 _ = require 'underscore-plus'
+generate = require './generate'
+digest = require './digest'
 hamlc = require 'haml-coffee'
+walkdir = require 'walkdir'
 assert = require 'assert'
 marked = require 'marked'
-tello = require 'tello'
-donna = require 'donna'
 path = require 'path'
 fs = require 'fs'
+
+SRC_DIRS = ['src', 'lib', 'app']
+BLACKLIST_FILES = ['Gruntfile.coffee']
+
+isAcceptableFile = (filePath) ->
+  try
+    return false if fs.statSync(filePath).isDirectory()
+
+  for file in BLACKLIST_FILES
+    return false if new RegExp(file+'$').test(filePath)
+
+  filePath.match(/\._?js$/)
+
+isInAcceptableDir = (inputPath, filePath) ->
+  # is in the root of the input?
+  return true if path.join(inputPath, path.basename(filePath)) is filePath
+
+  # is under src, lib, or app?
+  acceptableDirs = (path.join(inputPath, dir) for dir in SRC_DIRS)
+  for dir in acceptableDirs
+    return true if filePath.indexOf(dir) == 0
+
+  false
 
 class Renderer
 
@@ -24,8 +48,32 @@ class Renderer
     if sourcePaths
       unless fs.existsSync(outPath)
         fs.mkdirSync(outPath)
-      metadata = donna.generateMetadata(sourcePaths)
-      digestedMetadata = tello.digest(metadata)
+
+      sourceJSFiles = []
+      for input in sourcePaths
+        absoluteInput = path.resolve(process.cwd(), input)
+        if fs.lstatSync(input).isDirectory()
+          for filename in walkdir.sync(input)
+            if isAcceptableFile(filename) and isInAcceptableDir(absoluteInput, filename)
+              sourceJSFiles.push(filename)
+        else if isAcceptableFile(input)
+          sourceJSFiles.push(input)
+
+
+      files = {}
+      for each in sourceJSFiles
+        eachCode = fs.readFileSync(each, 'utf8')
+        try
+          files[each] = generate(eachCode)
+        catch e
+          console.error('Error: processing joanna docs for file ' + filePath)
+
+      metadata =
+        repository: 'someurl', # packageJson.repository.url
+        version: 'some version', # packageJson.version
+        files: files
+      digestedMetadata = digest.digest([metadata])
+
       @metadata = digestedMetadata
       @renderClassList(outPath, options)
       @renderClasses(outPath, options)
@@ -33,7 +81,7 @@ class Renderer
   renderClasses: (outPath, options) ->
     for name, clazz of @metadata.classes
       renderedClazz = @renderClass clazz, options
-      fs.writeFileSync(path.join(outPath, "#{name}.md"), renderedClazz)
+      fs.writeFileSync(path.join(outPath, "#{name}.html"), renderedClazz)
 
   renderClassList: (outPath) ->
     classes = []
@@ -110,8 +158,18 @@ class Renderer
 
   renderMethods: (methods, sectionName, type, options) ->
     methods = _.filter methods, (method) -> method.sectionName is sectionName
-    methods = _.map methods, (method) => @renderMethod(method, type, options)
-    methods.join('\n')
+    mergedGetSetMethods = []
+
+    lookup = new Map()
+    for each in methods
+      if other = lookup.get(each.name)
+        other.kind = 'getset'
+      else
+        lookup.set(each.name, each)
+        mergedGetSetMethods.push(each)
+
+    mergedGetSetMethods = _.map mergedGetSetMethods, (method) => @renderMethod(method, type, options)
+    mergedGetSetMethods.join('\n')
 
   renderMethod: (method, type, options) ->
     if options?.verbose
@@ -125,11 +183,14 @@ class Renderer
     @renderTemplate('method', method, resolve: ['description'], markdown: ['description'])
 
   renderSignature: (method) ->
-    parameters = if method.arguments then @renderParameters(method) else ''
-    "#{method.name}(#{parameters})"
+    if method.kind is 'get' or method.kind is 'set' or method.kind is 'getset'
+      "#{method.name}"
+    else
+      parameters = if method.arguments then @renderParameters(method) else ''
+      "#{method.name}(#{parameters})"
 
   renderSignifier: (type) ->
-    if type is 'static' then '.' else '::'
+    if type is 'static' then 'static ' else ''
 
   renderParameterBlock: (method) ->
     rows = (@renderParameterRow(parameter) for parameter in method.arguments)

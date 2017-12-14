@@ -1,5 +1,4 @@
-require( 'coffee-script/register' );
 var Renderer = require('./lib/renderer')
-module.exports = { 
+module.exports = {
   Renderer: Renderer
 }
