@@ -59,14 +59,14 @@ class Renderer
         else if isAcceptableFile(input)
           sourceJSFiles.push(input)
 
-
       files = {}
       for each in sourceJSFiles
         eachCode = fs.readFileSync(each, 'utf8')
         try
           files[each] = generate(eachCode)
         catch e
-          console.error('Error: processing joanna docs for file ' + filePath)
+          console.error('Error: processing joanna docs for file ' + each)
+          console.error(e)
 
       metadata =
         repository: 'someurl', # packageJson.repository.url

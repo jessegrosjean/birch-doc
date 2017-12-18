@@ -105,14 +105,20 @@ class Digester
     sections
 
   sectionFromCommentEntity: (commentEntity) ->
-    doc = atomdoc.parse(commentEntity.doc)
-    if doc?.visibility is 'Section'
-      name: doc.summary
-      description: doc.description?.replace(doc.summary, '').trim() ? ''
-      startRow: commentEntity.range[0][0]
-      endRow: commentEntity.range[1][0]
-    else
-      null
+    try
+      doc = atomdoc.parse(commentEntity.doc)
+      if doc?.visibility is 'Section'
+        return {} =
+          name: doc.summary
+          description: doc.description?.replace(doc.summary, '').trim() ? ''
+          startRow: commentEntity.range[0][0]
+          endRow: commentEntity.range[1][0]
+      else
+        return null
+    catch e
+      console.log('failed atomdoc parse: ' + commentEntity.doc)
+      console.log(e)
+      return null
 
   filterSectionsForRowRange: (startRow, endRow) ->
     sections = []
@@ -129,11 +135,16 @@ class Digester
     null
 
   docFromDocString: (docString) ->
-    classDoc = atomdoc.parse(docString) if docString?
-    if classDoc and classDoc.isPublic()
-      classDoc
-    else
-      null
+    try
+      doc = atomdoc.parse(docString) if docString?
+      if doc and doc.isPublic()
+        return doc
+      else
+        return null
+    catch e
+      console.log('failed atomdoc parse: ' + docString)
+      console.log(e)
+      return null
 
   objectFromPosition: (position) ->
     @current.objects[position[0]][position[1]]
