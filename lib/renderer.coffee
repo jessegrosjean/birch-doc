@@ -4,6 +4,7 @@ generate = require './generate'
 digest = require './digest'
 hamlc = require 'haml-coffee'
 walkdir = require 'walkdir'
+mkdirp = require 'mkdirp'
 assert = require 'assert'
 marked = require 'marked'
 path = require 'path'
@@ -47,7 +48,7 @@ class Renderer
     assert(outPath, 'requires outPath param')
     if sourcePaths
       unless fs.existsSync(outPath)
-        fs.mkdirSync(outPath)
+        mkdirp.sync(outPath)
 
       sourceJSFiles = []
       for input in sourcePaths
@@ -360,14 +361,31 @@ class Renderer
     @referenceMap[name] = url
 
   resolveReference: (text) ->
-    itemText = text.replace(/\{(.*)\}/, '$1')
+    itemText = text.replace(/\{(.*)\}/, '$1').trim()
+    type = if /^[A-Z]/.test(itemText) then 'static' else 'instance'
 
+    if itemText is 'outlineEditor.selection' or itemText is 'startItem'
+      debugger
+
+    if itemText.indexOf('.') isnt -1
+      [klass, item] = itemText.split('.')
+      if type is 'instance'
+        klass = klass[0].toUpperCase() + klass.slice(1)
+    else if type is 'static'
+      klass = itemText
+      item = ''
+    else
+      klass = ''
+      item = itemText
+
+    ###
     if itemText.indexOf('.') isnt -1
       type = 'static'
       [klass, item] = itemText.split('.')
     else if itemText.indexOf('::') isnt -1
       type = 'instance'
       [klass, item] = itemText.split('::')
+    ###
 
     switch type
       when 'static' then @resolveStaticReference(klass, item, itemText)
